@@ -14,6 +14,7 @@ install:
 	pip install -U --editable .
 
 release:
+	pip install -U pip setuptools
 	pip install -U -r requirements/release.txt
 
 develop: release install
