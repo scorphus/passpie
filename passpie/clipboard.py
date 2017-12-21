@@ -26,7 +26,8 @@ def ensure_commands(commands):
         if which(command_name) and command:
             return command
     else:
-        logging.error('missing commands: ', ' or '.join(commands))
+        logging.error('missing commands: %s', ' or '.join(commands))
+    return []
 
 
 def clean(command, delay):

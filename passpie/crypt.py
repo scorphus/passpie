@@ -41,7 +41,7 @@ def make_key_input(passphrase, key_length):
 
 def export_keys(homedir):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg') or which('gpg2'),
         '--no-version',
         '--no-tty',
         '--homedir', homedir,
@@ -55,7 +55,7 @@ def export_keys(homedir):
 
 def export_secret_keys(homedir, passphrase):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg') or which('gpg2'),
         '--no-version',
         '--no-tty',
         '--pinentry-mode', 'loopback',
@@ -65,13 +65,14 @@ def export_secret_keys(homedir, passphrase):
         '--armor',
         '-o', '-'
     ]
-    output, error = process.call(command, input=passphrase)
+
+    output, error = process.call(command, input='{}\n'.format(passphrase))
     if error:
         # Fallback command in case that GPG version < 2.1
         # with versions lower than 2.1 it was possible to
         # export secret keys without passphrase
         fallback_command = [
-            which('gpg2') or which('gpg'),
+            which('gpg') or which('gpg2'),
             '--no-version',
             '--no-tty',
             '--homedir', homedir,
@@ -86,7 +87,7 @@ def export_secret_keys(homedir, passphrase):
 def create_keys(passphrase, path=None, key_length=4096):
     homedir = tempdir()
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg') or which('gpg2'),
         '--batch',
         '--no-tty',
         '--homedir', homedir,
@@ -104,7 +105,7 @@ def create_keys(passphrase, path=None, key_length=4096):
 
 def import_keys(keys_path, homedir):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg') or which('gpg2'),
         '--no-tty',
         '--batch',
         '--no-secmem-warning',
@@ -119,7 +120,7 @@ def import_keys(keys_path, homedir):
 
 def get_default_recipient(homedir, secret=False):
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg') or which('gpg2'),
         '--no-tty',
         '--batch',
         '--no-secmem-warning',
@@ -143,7 +144,7 @@ def get_default_recipient(homedir, secret=False):
 def encrypt(data, recipient, homedir):
     recipient = recipient if recipient else get_default_recipient(homedir)
     command = [
-        which('gpg2') or which('gpg'),
+        which('gpg') or which('gpg2'),
         '--batch',
         '--no-tty',
         '--always-trust',
@@ -161,7 +162,7 @@ def decrypt(data, recipient, passphrase, homedir):
     with NamedTemporaryFile("w", delete=False) as armored_file:
         armored_file.write(data)
         command = [
-            which('gpg2') or which('gpg'),
+            which('gpg') or which('gpg2'),
             '--no-version',
             '--no-tty',
             '--pinentry-mode', 'loopback',
@@ -172,14 +173,14 @@ def decrypt(data, recipient, passphrase, homedir):
             '--decrypt', armored_file.name,
         ]
 
-    output, error = process.call(command, input=passphrase)
+    output, error = process.call(command, input='{}\n'.format(passphrase))
     if error:
         # Fallback command in case that GPG version < 2.1
         # with versions lower than 2.1 it was possible to
         # decrypt armored data with passphrase as an option
         # now passphrases have to piped loopback
         command = [
-            which('gpg2') or which('gpg'),
+            which('gpg') or which('gpg2'),
             '--batch',
             '--no-tty',
             '--always-trust',
